@@ -1,13 +1,9 @@
 
-// 5 - Récupérer ce qui est tapé dans l'input et filtrer (avant le map) les données
-//coutry.name.includes(inputSearch.value);
-
 // 6 - Avec la méthode Slice gérer le nombre de pays affichés (inputRange.value)
 
 // 7 - Gérer les 3 boutons pour trier (méthode sort()) les pays
 const countriesContainer = document.querySelector(".countries-container");
-const inputSearch = document.getElementById("inputSearch")
-const inputRange = document.getElementById("inputRange")
+
 let countriesData = [];
 
 async function fetchCountries() {
@@ -22,23 +18,31 @@ async function fetchCountries() {
 
 function displayCountries() {
 	countriesContainer.innerHTML = countriesData
-	.map(
-		(country) =>
-			`
+		.filter((country) => 
+		country.translations.fra.common
+		.toLowerCase()
+		.includes(inputSearch.value.toLowerCase()))
+		.slice(0, inputRange.value)
+		.map(
+			(country) =>
+				`
     		<div class="card">
-      		<img src="${country.flags.svg}" alt="drapeau ${country.translations.fra.common}">
+      		<img src="${country.flags.svg}" alt="drapeau ${
+					country.translations.fra.common
+				}">
       		<h2>${country.translations.fra.common}</h2>
 					<h4>${country.capital}</h4>
 					<p>population : ${country.population.toLocaleString()}</p>
     		</div>
     `
-	).join("");
+		)
+		.join("");
 }
 
 fetchCountries();
 
-inputSearch.addEventListener("input", (e) => {
-	fetchCountries(e.target.value)
-	console.log(e.target.value);
-	
-});
+inputSearch.addEventListener("input", displayCountries);
+inputRange.addEventListener("input", () => {
+	displayCountries();
+	rangeValue.textContent = inputRange.value;
+})
