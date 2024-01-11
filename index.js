@@ -1,10 +1,8 @@
-
-// 6 - Avec la méthode Slice gérer le nombre de pays affichés (inputRange.value)
-
-// 7 - Gérer les 3 boutons pour trier (méthode sort()) les pays
 const countriesContainer = document.querySelector(".countries-container");
-
+const btnSort = document.querySelectorAll(".btnSort")
 let countriesData = [];
+let sortMethod = "alpha";
+
 
 async function fetchCountries() {
 	await fetch(`https://restcountries.com/v3.1/all`)
@@ -12,7 +10,6 @@ async function fetchCountries() {
 		// .then((data) => console.log(data)); pour verifier les datas récup
 		.then((data) => (countriesData = data));
 
-	console.log(countriesData);
 	displayCountries();
 }
 
@@ -22,6 +19,16 @@ function displayCountries() {
 		country.translations.fra.common
 		.toLowerCase()
 		.includes(inputSearch.value.toLowerCase()))
+		.sort((a,b) => {
+			if (sortMethod === "maxToMin"){
+				return b.population - a.population;
+			} else if ( sortMethod === "minToMax") {
+				return  a.population - b.population;
+			} else if (sortMethod === "alpha") {
+				return a.translations.fra.common.localeCompare(
+					b.translations.fra.common);
+			}
+		})
 		.slice(0, inputRange.value)
 		.map(
 			(country) =>
@@ -39,10 +46,17 @@ function displayCountries() {
 		.join("");
 }
 
-fetchCountries();
+window.addEventListener("load", fetchCountries)
 
 inputSearch.addEventListener("input", displayCountries);
 inputRange.addEventListener("input", () => {
 	displayCountries();
 	rangeValue.textContent = inputRange.value;
-})
+});
+
+btnSort.forEach((btn) => {
+	btn.addEventListener("click" , (e) => {
+		sortMethod = e.target.id;
+		displayCountries()
+	});
+});
